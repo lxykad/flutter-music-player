@@ -7,23 +7,15 @@ import Foundation
 
 struct MediaDescription: Codable {
     let mediaId: String
-    var title: String
-    var subtitle: String
-    var description: String
-    var iconUri: URL
-    var extras: [String: AnyObject]
-    var mediaUri: URL
-
-    init(from decoder: Decoder) throws {
-
-    }
-
-    func encode(to encoder: Encoder) throws {
-
-    }
+    let title: String?
+    let subtitle: String?
+    let description: String?
+    var iconUri: URL?
+//    var extras: [String: AnyObject]
+    var mediaUri: URL?
 }
 
-struct MediaMetadata: Codable {
+struct MediaMetadata: Codable, Equatable {
     let title: String
     let artist: String
     let duration: Int
@@ -38,11 +30,11 @@ struct MediaMetadata: Codable {
     let trackNumber: Int
     let numTracks: Int
     let discNumber: Int
-    let albumArtist: String
-    let artUri: String
-    let albumArtUri: String
-    let userRating: AnyObject
-    let rating: AnyObject
+    let albumArtist: String?
+    let artUri: String?
+    let albumArtUri: String?
+//    let userRating: AnyObject
+//    let rating: AnyObject
     let displayTitle: String?
     let displaySubtitle: String
     let displayDescription: String
@@ -52,19 +44,15 @@ struct MediaMetadata: Codable {
     let mediaUri: String?
     let advertisement: Int
 
+    let downloadStatus: Int
+
     private var description: MediaDescription? = nil
-
-    init(from decoder: Decoder) throws {
-
-    }
-
-    func encode(to encoder: Encoder) throws {
-    }
 }
 
 extension MediaMetadata {
 
-    func getDescription() -> MediaDescription {
+    /// Get [MediaMetadata] description
+    mutating func getDescription() -> MediaDescription {
         if (description != nil) {
             return description!;
         }
@@ -77,7 +65,7 @@ extension MediaMetadata {
             while (textIndex < text.count && keyIndex < description.count) {
                 let next = description[keyIndex]
                 keyIndex += 1
-                if (next?.isEmpty != false) {
+                if (next != nil && !next!.isEmpty) {
                     text[textIndex] = next;
                     textIndex += 1
                 }
@@ -88,10 +76,27 @@ extension MediaMetadata {
             text[2] = displayDescription
         }
 
-        var mediaUri: URL?;
-        if (self.mediaUri != nil) {
-            mediaUri = URL(string: self.mediaUri!)
+        var iconUri: URL?
+        let iconUrl = [displayIconUri, artUri, albumArtUri].first {
+            $0 != nil && !$0!.isEmpty
+        } ?? nil
+        if let url = iconUrl {
+            iconUri = URL(string: url)
         }
+
+        //TODO extra data
+
+        let mediaUrl = self.mediaUri.map {
+            URL(string: $0)
+        } ?? nil
+
+        self.description = MediaDescription(
+                mediaId: mediaId,
+                title: text[0],
+                subtitle: text[1], description: text[2],
+                iconUri: iconUri,
+                mediaUri: mediaUrl)
+        return description!
     }
 
 }
