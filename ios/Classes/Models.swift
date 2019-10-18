@@ -15,47 +15,15 @@ struct MediaDescription: Codable {
     var mediaUri: URL?
 }
 
-struct MediaMetadata: Codable, Equatable {
-    let title: String
-    let artist: String
-    let duration: Int
-    let album: String
-    let writer: String
-    let composer: String
-    let author: String
-    let compilation: String
-    let date: String
-    let year: Int
-    let genre: String
-    let trackNumber: Int
-    let numTracks: Int
-    let discNumber: Int
-    let albumArtist: String?
-    let artUri: String?
-    let albumArtUri: String?
-//    let userRating: AnyObject
-//    let rating: AnyObject
-    let displayTitle: String?
-    let displaySubtitle: String
-    let displayDescription: String
-    let displayIconUri: String
-    let mediaId: String
-    let btFolderType: Int
-    let mediaUri: String?
-    let advertisement: Int
+class MediaMetadata: Equatable, CustomStringConvertible {
 
-    let downloadStatus: Int
+    static func ==(lhs: MediaMetadata, rhs: MediaMetadata) -> Bool {
+        lhs.mediaId == rhs.mediaId
+    }
 
-    private var description: MediaDescription? = nil
-}
+    let data: [String: Any]
 
-extension MediaMetadata {
-
-    /// Get [MediaMetadata] description
-    mutating func getDescription() -> MediaDescription {
-        if (description != nil) {
-            return description!;
-        }
+    private var mediaDescription: MediaDescription {
         var text = Array<String?>(repeating: nil, count: 3)
         if displayTitle?.isEmpty != false {
             // use whatever fields we can
@@ -89,14 +57,114 @@ extension MediaMetadata {
         let mediaUrl = self.mediaUri.map {
             URL(string: $0)
         } ?? nil
-
-        self.description = MediaDescription(
+        return MediaDescription(
                 mediaId: mediaId,
                 title: text[0],
                 subtitle: text[1], description: text[2],
                 iconUri: iconUri,
                 mediaUri: mediaUrl)
-        return description!
+    }
+
+
+    init(data: [String: Any]) {
+        self.data = data
+
+    }
+
+    var title: String? {
+        data["title"] as? String
+    }
+
+    var artist: String? {
+        data["artist"] as? String
+    }
+
+    var duration: Int? {
+        data["duration"] as? Int
+    }
+
+    var album: String? {
+        data["album"] as? String
+    }
+    var writer: String? {
+        data["writer"] as? String
+    }
+    var composer: String? {
+        data["composer"] as? String
+    }
+    var author: String? {
+        data["author"] as? String
+    }
+    var compilation: String? {
+        data["compilation"] as? String
+    }
+    var date: String? {
+        data["date"] as? String
+    }
+    var year: Int? {
+        data["year"] as? Int
+    }
+    var genre: String? {
+        data["genre"] as? String
+    }
+    var trackNumber: Int? {
+        data["trackNumber"] as? Int
+    }
+    var numTracks: Int? {
+        data["numTracks"] as? Int
+    }
+    var discNumber: Int? {
+        data["discNumber"] as? Int
+    }
+    var albumArtist: String? {
+        data["albumArtist"] as? String
+    }
+    var artUri: String? {
+        data["artUri"] as? String
+    }
+    var albumArtUri: String? {
+        data["albumArtUri"] as? String
+    }
+//    let userRating: AnyObject
+//    let rating: AnyObject
+
+    var displayTitle: String? {
+        data["displayTitle"] as? String
+    }
+    var displaySubtitle: String? {
+        data["displaySubtitle"] as? String
+    }
+    var displayDescription: String? {
+        data["displayDescription"] as? String
+    }
+    var displayIconUri: String? {
+        data["displayIconUri"] as? String
+    }
+    var mediaId: String {
+        data["mediaId"] as! String
+    }
+    var btFolderType: Int? {
+        data["btFolderType"] as? Int
+    }
+    var mediaUri: String? {
+        data["mediaUri"] as? String
+    }
+    var advertisement: Int? {
+        data["advertisement"] as? Int
+    }
+    var downloadStatus: Int? {
+        data["downloadStatus"] as? Int
+    }
+    var description: String {
+        "MediaMetadata(data: \(data))"
+    }
+}
+
+extension MediaMetadata {
+
+    /// Get [MediaMetadata] description
+    func getDescription() -> MediaDescription {
+        mediaDescription
     }
 
 }
