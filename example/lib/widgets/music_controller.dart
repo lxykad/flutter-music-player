@@ -1,89 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:music_player_example/player/player.dart';
 
-class MusicControlBar extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
-    final MusicPlayerValue state = PlayerState.of(context);
-    var description = state.metadata?.getDescription();
-    if (state.playbackState.state == PlaybackState.STATE_NONE) {
-      return Container();
-    }
-    return Container(
-      padding: EdgeInsets.only(bottom: bottomPadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          _ControllerBar(),
-          Text.rich(TextSpan(children: [
-            TextSpan(text: 'current metadata:'),
-            TextSpan(text: description?.title),
-          ])),
-          Text.rich(TextSpan(children: [
-            TextSpan(text: state.playList.queueTitle ?? "" + "\n"),
-            TextSpan(text: state.playList.queue.join()),
-          ])),
-          Text.rich(TextSpan(children: [
-            TextSpan(text: "playback state : \n"),
-            TextSpan(text: """
-speed:  ${state.playbackState.playbackSpeed} 
-bufferedPosition:  ${state.playbackState.bufferedPosition} 
-position:  ${state.playbackState.position} 
-errorCode:  ${state.playbackState.errorCode} 
-updateTime:  ${DateTime.fromMillisecondsSinceEpoch(state.playbackState.lastPositionUpdateTime).toIso8601String()} 
-activeItemId:  ${state.playbackState.activeQueueItemId} 
-          """),
-          ])),
-        ],
-      ),
-    );
-  }
-}
-
-class _ControllerBar extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ButtonBar(
-      children: <Widget>[
-        RepeatModelButton(),
-        IconButton(
-            icon: Icon(Icons.skip_previous),
-            onPressed: () {
-              PlayerWidget.transportControls(context).skipToPrevious();
-            }),
-        PlayPauseButton(),
-        IconButton(
-            icon: Icon(Icons.skip_next),
-            onPressed: () {
-              PlayerWidget.transportControls(context).skipToNext();
-            }),
-      ],
-    );
-  }
-}
-
 class PlayPauseButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final playbackState = PlayerState.of(context).playbackState;
-    if (playbackState.state == PlaybackState.STATE_PLAYING) {
+    final playbackState = PlayerStateWidget.of(context).playbackState;
+    if (playbackState.state == PlayerState.Playing) {
       return IconButton(
           icon: Icon(Icons.pause),
           onPressed: () {
             PlayerWidget.transportControls(context).pause();
           });
-    } else if (playbackState.state == PlaybackState.STATE_BUFFERING) {
-      return Container(
-        height: 24,
-        width: 24,
-        //to fit  IconButton min width 48
-        margin: EdgeInsets.only(right: 12),
-        padding: EdgeInsets.all(4),
-        child: CircularProgressIndicator(),
+    } else if (playbackState.state == PlayerState.Buffering) {
+      return Center(
+        child: Container(
+          height: 24,
+          width: 24,
+          //to fit  IconButton min width 48
+          margin: EdgeInsets.only(right: 12),
+          padding: EdgeInsets.all(4),
+          child: CircularProgressIndicator(),
+        ),
       );
-    } else if (playbackState.state == PlaybackState.STATE_NONE) {
-      return Container();
     } else {
       return IconButton(
           icon: Icon(Icons.play_arrow),
@@ -98,7 +36,7 @@ class PlayPauseButton extends StatelessWidget {
 class RepeatModelButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final MusicPlayerValue state = PlayerState.of(context);
+    final MusicPlayerValue state = PlayerStateWidget.of(context);
 
     Widget icon;
     if (state.playMode == PlayMode.shuffle) {
@@ -116,14 +54,39 @@ class RepeatModelButton extends StatelessWidget {
   }
 
   static PlayMode _getNext(PlayMode playMode) {
-    switch (playMode) {
-      case PlayMode.sequence:
-        return PlayMode.shuffle;
-      case PlayMode.shuffle:
-        return PlayMode.single;
-      case PlayMode.single:
-        return PlayMode.sequence;
+    if (playMode == PlayMode.sequence) {
+      return PlayMode.shuffle;
+    } else if (playMode == PlayMode.shuffle) {
+      return PlayMode.single;
+    } else if (playMode == PlayMode.single) {
+      return PlayMode.sequence;
     }
     throw "can not reach";
+  }
+}
+
+class MusicPlaybackSpeedButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final MusicPlayerValue state = PlayerStateWidget.of(context);
+    double speed = state.playbackState.speed;
+    return FlatButton(
+      onPressed: () {
+        PlayerWidget.transportControls(context).setPlaybackSpeed(_getNext(speed));
+      },
+      child: Text("${speed}X"),
+    );
+  }
+
+  double _getNext(double speed) {
+    if (speed < 1) {
+      return 1.0;
+    } else if (speed == 1) {
+      return 1.5;
+    } else if (speed > 1) {
+      return 0.5;
+    } else {
+      return 1;
+    }
   }
 }

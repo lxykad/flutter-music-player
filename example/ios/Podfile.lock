@@ -1,0 +1,35 @@
+PODS:
+  - Flutter (1.0.0)
+  - music_player (0.0.1):
+    - Flutter
+    - SwiftAudio (~> 0.11.2)
+  - SwiftAudio (0.11.2)
+  - system_clock (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - music_player (from `.symlinks/plugins/music_player/ios`)
+  - system_clock (from `.symlinks/plugins/system_clock/ios`)
+
+SPEC REPOS:
+  trunk:
+    - SwiftAudio
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  music_player:
+    :path: ".symlinks/plugins/music_player/ios"
+  system_clock:
+    :path: ".symlinks/plugins/system_clock/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  music_player: 9c268ba7e6f092ffd11fea0510ffdf5ebe6716de
+  SwiftAudio: 217f5f184b27a0e25ff0fe7647021f05a21c06c9
+  system_clock: 3efb51d18e565092e2a97bc605c6255f328bd13a
+
+PODFILE CHECKSUM: 4e8f8b2be68aeea4c0d5beb6ff1e79fface1d048
+
+COCOAPODS: 1.10.0.beta.2

@@ -1,28 +1,46 @@
-enum PlayMode {
-  sequence,
-  shuffle,
-  single,
-}
+class PlayMode {
+  final int index;
 
-PlayMode parsePlayMode(String name) {
-  switch (name?.toLowerCase() ?? "") {
-    case "shuffle":
-      return PlayMode.shuffle;
-    case "single":
-      return PlayMode.single;
-    default:
-      return PlayMode.sequence;
-  }
-}
+  const PlayMode._internal(this.index);
 
-String playModeToStr(PlayMode mode) {
-  switch (mode) {
-    case PlayMode.shuffle:
-      return "shuffle";
-    case PlayMode.sequence:
-      return "sequence";
-    case PlayMode.single:
-      return "single";
+  static const shuffle = PlayMode._internal(0);
+  static const single = PlayMode._internal(1);
+  static const sequence = PlayMode._internal(2);
+
+  factory PlayMode.undefined(int index) {
+    assert(!const [0, 1, 2].contains(index), "index can not be 0,1,2");
+    return PlayMode(index);
   }
-  throw "can not reach";
+
+  factory PlayMode(int index) {
+    if (index == 0) {
+      return shuffle;
+    } else if (index == 1) {
+      return single;
+    } else if (index == 2) {
+      return sequence;
+    } else {
+      return PlayMode._internal(index);
+    }
+  }
+
+  @override
+  bool operator ==(Object other) => identical(this, other) || other is PlayMode && index == other.index;
+
+  @override
+  int get hashCode => index.hashCode;
+
+  @override
+  String toString() {
+    switch (index) {
+      case 0:
+        return "PlayMode.shuffle";
+      case 1:
+        return "PlayMode.single";
+      case 2:
+        return "PlayMode.sequence";
+      default:
+        return "PlayMode.undefined($index)";
+    }
+  }
 }
